@@ -2,7 +2,6 @@ package Weather
 
 import (
 	"encoding/json"
-	"github.com/zhangyiming748/Weather/log"
 	"io"
 	"net/http"
 	"strings"
@@ -60,16 +59,12 @@ func GetWeather(key, city, extensions, output string) Fusion {
 	args := strings.Join([]string{key, city, extensions, output}, "&")
 	prefix := "https://restapi.amap.com/v3/weather/weatherInfo"
 	url := strings.Join([]string{prefix, args}, "?")
-	log.Debug.Println(url)
+
 	var report Report
 	response, _ := http.Get(url)
 	defer response.Body.Close()
 	body, _ := io.ReadAll(response.Body)
 	_ = json.Unmarshal(body, &report)
-	log.Debug.Println(report)
-	// "https://restapi.amap.com/v3/weather/weatherInfo?city=110101&key=<用户key>"
-	log.Debug.Printf("%T\n", report.Forecasts[0].Reporttime)
-	//loc, _ := time.LoadLocation("Asia/Shanghai")
 	t, _ := time.Parse("2006-01-02 15:04:05", report.Forecasts[0].Reporttime)
 	var forecasts []Forecast
 	today_forecast := &Forecast{
@@ -117,6 +112,5 @@ func GetWeather(key, city, extensions, output string) Fusion {
 		reporttime: t,
 		Forecasts:  forecasts,
 	}
-	log.Debug.Printf("%+v\n", fusion)
 	return *fusion
 }
